@@ -17,6 +17,7 @@ function App() {
   const [turns, setTruns] = useState(0)
   const [choiceOne, setChoiceOne] = useState(null)
   const [choiceTwo, setChoiceTwo] = useState(null)
+  const [disabled, setDisabled] = useState(false)
 
   //shuffle cards
   const shuffleCards = () => {
@@ -24,6 +25,8 @@ function App() {
       .sort(() => Math.random() - 0.5)
       .map((card) => ({ ...card, id: Math.random() }))
     
+    setChoiceOne(null)
+    setChoiceTwo(null) 
     setCards(shuffledCards)
     setTruns(0)
   }
@@ -38,11 +41,13 @@ function App() {
     setChoiceOne(null)
     setChoiceTwo(null)
     setTruns(prevTurns => prevTurns + 1)
+    setDisabled(false)
   }
 
   //NET NINJA SOLUTION FOR COMPARING CARD SELECTIONS (USING 'USEEFFECT')
   useEffect(() => {
     if (choiceOne && choiceTwo) {
+      setDisabled(true)
 
       if (choiceOne.src === choiceTwo.src) {
         setCards(prevCards => {
@@ -60,6 +65,11 @@ function App() {
       }
     }
   }, [choiceOne, choiceTwo])
+
+  // start game automatically
+  useEffect (() => {
+    shuffleCards()
+  }, [])
 
   // MY SOLUTION FOR COMPARING CARD SELECTIONS (DID NOT USE 'USEEFFECT')
   // const compareChoice = () => {
@@ -86,10 +96,11 @@ function App() {
             card={card}
             handleChoice={handleChoice}
             flipped={card === choiceOne || card === choiceTwo || card.matched}
+            disabled={disabled}
           />
         ))}
       </div>
-      
+      <p className="turnTracker">Turn: {turns}</p>      
     </div>
   );
 }
